@@ -205,7 +205,11 @@ class EPD(object):
 
     def wait_until_idle(self):
         """ Wait until screen is idle by polling the busy pin """
+        # HACK: fix e-Paper not picking up ready signal and getting stuck in busy state
+        # https://github.com/waveshare/e-Paper/issues/30#issuecomment-640254220
+        self.send_command(0x71)
         while(self.digital_read(BUSY_PIN) == 0):      # 0: busy, 1: idle
+            self.send_command(0x71)
             self.delay_ms(50)
 
     def reset(self):
