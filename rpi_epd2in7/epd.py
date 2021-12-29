@@ -42,10 +42,13 @@ DC_PIN          = 25
 CS_PIN          = 8
 BUSY_PIN        = 24
 
-
 # Display resolution
 EPD_WIDTH       = 176
 EPD_HEIGHT      = 264
+
+# Orientation definition
+PORTRAIT = 0
+LANDSCAPE = 90
 
 # EPD2IN7 commands
 # Specifciation: https://www.waveshare.com/w/upload/2/2d/2.7inch-e-paper-Specification.pdf
@@ -97,11 +100,12 @@ def _nearest_mult_of_8(number, up=True):
 
 
 class EPD(object):
-    def __init__(self, partial_refresh_limit=32, fast_refresh=True):
+    def __init__(self, partial_refresh_limit=32, fast_refresh=True, orientation=PORTRAIT)):
         """ Initialize the EPD class.
         `partial_refresh_limit` - number of partial refreshes before a full refrersh is forced
         `fast_frefresh` - enable or disable the fast refresh mode,
-                          see smart_update() method documentation for details"""
+                          see smart_update() method documentation for details
+        `orientation` - determinate the orientation of the display"""
         self.width = EPD_WIDTH
         """ Display width, in pixels """
         self.height = EPD_HEIGHT
@@ -114,6 +118,7 @@ class EPD(object):
         self._last_frame = None
         self._partial_refresh_count = 0
         self._init_performed = False
+        self._orientation = orientation
         self.spi = spidev.SpiDev(0, 0)
 
     def digital_write(self, pin, value):
@@ -250,6 +255,8 @@ class EPD(object):
 
     def _get_frame_buffer(self, image):
         """ Get a full frame buffer from a PIL Image object """
+        if self._orientation is LANDSCAPE: image = image.rotate(LANDSCAPE, expand = True)
+
         image_monocolor = image.convert('1')
         imwidth, imheight = image_monocolor.size
         if imwidth != self.width or imheight != self.height:
