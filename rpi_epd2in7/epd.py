@@ -255,7 +255,7 @@ class EPD(object):
 
     def _get_frame_buffer(self, image):
         """ Get a full frame buffer from a PIL Image object """
-        if self._orientation is LANDSCAPE: image = image.rotation(LANDSCAPE, expand = True)
+        if self._orientation is LANDSCAPE: image = image.rotate(LANDSCAPE, expand = True)
 
         image_monocolor = image.convert('1')
         imwidth, imheight = image_monocolor.size
